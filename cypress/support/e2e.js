@@ -14,12 +14,12 @@
 // ***********************************************************
 
 // Import commands.js using ES2015 syntax:
-import 'cypress-xpath';
-import './commands'
-import 'cypress-wait-until';
-require('cypress-xpath')
-require('cypress-wait-until')
-require('./commands')
+import "cypress-xpath";
+import "./commands";
+import "cypress-wait-until";
+require("cypress-xpath");
+require("cypress-wait-until");
+require("./commands");
 
 // Alternatively you can use CommonJS syntax:
 // require('./commands')
@@ -32,10 +32,18 @@ require('./commands')
 //     cy.log('Global After Hook');
 //   });
 
-
-//   beforeEach(() => {
-//     cy.log('Global Before Each Hook');
+// beforeEach(() => {
+//   cy.session('loginTestingUser', () => {
+//       cy.get(tenantLabel_feild).should('be.visible').scrollIntoView().type(set_orgName);
+//       cy.get(continue_button).should('be.visible').scrollIntoView().click({ force: true });
+//       cy.get(email_feild).should('be.visible').scrollIntoView().clear().click({ force: true });
+//       cy.get(email_feild).should('be.visible').scrollIntoView().type(set_email);
+//       cy.get(password_feild).should('be.visible').scrollIntoView().type(set_password);
+//       cy.get(signIn_button).should('be.visible').scrollIntoView().click({ force: true });
+//       }, {
+//       cacheAcrossSpecs: true
 //   })
+// })
 
 //   afterEach(() => {
 //     cy.log('Global After Each Hook');

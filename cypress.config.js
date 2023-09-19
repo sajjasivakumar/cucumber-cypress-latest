@@ -1,27 +1,27 @@
-const { defineConfig } = require('cypress');
-const createBundler = require('@bahmutov/cypress-esbuild-preprocessor');
+const { defineConfig } = require("cypress");
+const createBundler = require("@bahmutov/cypress-esbuild-preprocessor");
 const {
   addCucumberPreprocessorPlugin,
   afterRunHandler,
-} = require('@badeball/cypress-cucumber-preprocessor');
-const createEsbuildPlugin = require('@badeball/cypress-cucumber-preprocessor/esbuild');
-const fs = require('fs');
+} = require("@badeball/cypress-cucumber-preprocessor");
+const createEsbuildPlugin = require("@badeball/cypress-cucumber-preprocessor/esbuild");
+const fs = require("fs");
 
 const setupNodeEvents = async (on, config) => {
   await addCucumberPreprocessorPlugin(on, config, {
     omitAfterRunHandler: true,
   });
   on(
-    'file:preprocessor',
+    "file:preprocessor",
     createBundler({
       plugins: [createEsbuildPlugin.default(config)],
     }),
   );
-  on('after:run', async (results) => {
+  on("after:run", async (results) => {
     if (results) {
       await afterRunHandler(config);
       fs.writeFileSync(
-        'cypress/reports/results.json',
+        "cypress/reports/results.json",
         JSON.stringify(
           {
             browserName: results.browserName,
@@ -34,7 +34,7 @@ const setupNodeEvents = async (on, config) => {
             endedTestsAt: results.endedTestsAt,
           },
           null,
-          '\t',
+          "\t",
         ),
       );
     }
@@ -43,28 +43,39 @@ const setupNodeEvents = async (on, config) => {
 };
 
 module.exports = defineConfig({
-  video: false,
-  retries: 0,
+  retries: 1,
   parallels: 0,
   viewportWidth: 1920,
   viewportHeight: 1080,
-  scrollBehavior: 'nearest',
+  scrollBehavior: "nearest",
   trashAssetsBeforeRuns: false,
   chromeWebSecurity: false,
   env: {
-    TAGS: 'not @ignore',
-    email: 'test001@gmail.com',
-    password: 'test009090',
+    TAGS: "not @ignore",
+    email: "xxxxxxxxx@xxxxxxx.com",
+    password: "xxxxxxxxx",
   },
   e2e: {
-    baseUrl: 'https://www.facebook.com',
-    defaultCommandTimeout: 500000,
-    responseTimeout: 50000,
-    specPattern: '**/*.feature',
-    supportFile: 'cypress/support/e2e.js',
+    baseUrl: "https://www.facebook.com/",
+    defaultCommandTimeout: 20000,
+    responseTimeout: 30000,
+    specPattern: "**/*.feature",
+    supportFile: "cypress/support/e2e.js",
+    fixturesFolder: "cypress/fixtures",
+    supportFolder: false,
+    testingType: "e2e",
     video: false,
+    videoCompression: false,
+    videosFolder: "cypress/videos",
+    trace: true,
+    traceFolder: "cypress/traces",
     setupNodeEvents,
-    excludeSpecPattern: ['*.js', '*.md'],
+    excludeSpecPattern: ["*.js", "*.md"],
     experimentalInteractiveRunEvents: true,
-  }
+    experimentalRunAllSpecs: true,
+    experimentalWebKitSupport: true,
+    experimentalMemoryManagement: false,
+    pageLoadTimeout: 90000,
+    slowTestThreshold: 10000,
+  },
 });

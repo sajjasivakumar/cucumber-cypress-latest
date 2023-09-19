@@ -1,107 +1,114 @@
-const report = require('multiple-cucumber-html-reporter');
-const dayjs = require('dayjs');
-const fs = require('fs');
-const https = require('https');
-const os = require('os');
-const path = require('path');
-const { exec } = require('child_process');
+const report = require("multiple-cucumber-html-reporter");
+const dayjs = require("dayjs");
+const fs = require("fs");
+const https = require("https");
+const os = require("os");
+const path = require("path");
+const { exec } = require("child_process");
 
-const BASE_URL = 'https://www.facebook.com/';
-const FILE_NAME = 'cucumber-json-formatter';
+const BASE_URL = "https://www.facebook.com";
+const FILE_NAME = "cucumber-json-formatter";
 
-let url = '';
+let url = "";
 let fileName = FILE_NAME;
 
 switch (os.platform()) {
-  case 'win32':
+  case "win32":
     url = `${BASE_URL}/${FILE_NAME}-windows-amd64`;
-    fileName += '.exe';
+    fileName += ".exe";
     break;
-  case 'darwin':
+  case "darwin":
     url = `${BASE_URL}/${FILE_NAME}-darwin-amd64`;
     break;
-  case 'linux':
+  case "linux":
     url = `${BASE_URL}/${FILE_NAME}-linux-amd64`;
     break;
   default:
-    console.log('Unsupported platform');
+    console.log("Unsupported platform");
     process.exit(1);
 }
 
-const filePath = path.join('./.bin', fileName);
-fs.mkdirSync('./.bin', { recursive: true });
+const filePath = path.join("./.bin", fileName);
+fs.mkdirSync("./.bin", { recursive: true });
 const file = fs.createWriteStream(filePath);
 
 https
   .get(url, (response) => {
     response.pipe(file);
 
-    file.on('finish', () => {
+    file.on("finish", () => {
       file.close();
-      console.log('File downloaded and renamed successfully');
+      console.log("File downloaded and renamed successfully");
 
-      if (os.platform() === 'darwin' || os.platform() === 'linux') {
+      if (os.platform() === "darwin" || os.platform() === "linux") {
         exec(`chmod +x ${filePath}`, (error) => {
           if (error) {
             console.log(`Error changing file permission: ${error}`);
           } else {
-            console.log('File permission changed successfully');
+            console.log("File permission changed successfully");
           }
         });
       }
     });
   })
-  .on('error', (err) => {
+  .on("error", (err) => {
     fs.unlinkSync(filePath);
-    console.log('Error: ', err.message);
+    console.log("Error: ", err.message);
   });
 
-const runInfo = JSON.parse(fs.readFileSync('cypress/reports/results.json', 'utf8'));
+const runInfo = JSON.parse(
+  fs.readFileSync("cypress/reports/results.json", "utf8"),
+);
 
 const getOSName = () => {
   const osNames = {
-    darwin: 'osx',
-    win32: 'windows',
-    ubuntu: 'ubuntu',
+    darwin: "osx",
+    win32: "windows",
+    ubuntu: "ubuntu",
   };
 
-  return osNames[runInfo['osName']] || console.log('Undefined browser');
+  return osNames[runInfo["osName"]] || console.log("Undefined browser");
 };
 
 const generateReport = () => {
   report.generate({
-    jsonDir: 'cypress/reports/json',
-    reportPath: 'cypress/reports',
+    jsonDir: "cypress/reports/json",
+    reportPath: "cypress/reports",
     metadata: {
       browser: {
-        name: runInfo['browserName'],
-        version: runInfo['browserVersion'],
+        name: runInfo["browserName"],
+        version: runInfo["browserVersion"],
       },
-      device: 'Local Test Machine',
+      device: "Local Test Machine",
       platform: {
         name: getOSName(),
-        version: runInfo['osVersion'],
+        version: runInfo["osVersion"],
       },
     },
     customData: {
-      title: 'Run Info',
+      title: "Run Info",
       data: [
-        { label: 'Project', value: 'ConsoleUI Project' },
-        { label: 'Release', value: '1.0.0' },
-        { label: 'Cypress Version', value: runInfo['cypressVersion'] },
-        { label: 'Node Version', value: runInfo['nodeVersion'] },
+        { label: "Author", value: "Siva Kumar Sajja" },
+        { label: "Project", value: "UI Automation Project" },
+        { label: "Release", value: "1.0.0" },
+        { label: "Cypress Version", value: runInfo["cypressVersion"] },
+        { label: "Node Version", value: runInfo["nodeVersion"] },
         {
-          label: 'Execution Start Time',
-          value: dayjs(runInfo['startedTestsAt']).format('YYYY-MM-DD HH:mm:ss.SSS'),
+          label: "Execution Start Time",
+          value: dayjs(runInfo["startedTestsAt"]).format(
+            "YYYY-MM-DD HH:mm:ss.SSS",
+          ),
         },
         {
-          label: 'Execution End Time',
-          value: dayjs(runInfo['endedTestsAt']).format('YYYY-MM-DD HH:mm:ss.SSS'),
+          label: "Execution End Time",
+          value: dayjs(runInfo["endedTestsAt"]).format(
+            "YYYY-MM-DD HH:mm:ss.SSS",
+          ),
         },
       ],
     },
     disableLog: true,
-    pageTitle: 'Cypress Cucumber Html Report Example',
+    pageTitle: "Test Execution Cucumber Html Report",
     openReportInBrowser: true,
     displayDuration: true,
   });
